@@ -120,3 +120,50 @@ flight, the loading state, a successful sentiment result rendering in the
 result card, and an API error rendering the error banner.
 
 Use `npm run test:watch` for interactive watch mode while developing.
+
+## Running the backend in Docker
+
+The backend has a production-ready [Dockerfile](backend/Dockerfile) and
+[.dockerignore](backend/.dockerignore). The image never bakes in your `.env`
+file or secrets — configuration is supplied at container runtime via
+environment variables, and it runs as a non-root user.
+
+Build the image (from the `backend/` directory):
+
+```bash
+cd backend
+docker build -t indian-equity-backend:latest .
+```
+
+Run it, passing the same variables you'd normally put in `.env`:
+
+```bash
+docker run -d \
+  --name indian-equity-backend \
+  -p 8000:8000 \
+  -e HF_TOKEN=your_hf_token \
+  -e HF_MODEL_ID=alexcruse07/indian-equity-sentiment-model \
+  -e ALLOWED_ORIGINS=http://localhost:5173 \
+  indian-equity-backend:latest
+```
+
+Or, load them from a local env file without ever copying it into the image:
+
+```bash
+docker run -d --name indian-equity-backend -p 8000:8000 \
+  --env-file backend/.env \
+  indian-equity-backend:latest
+```
+
+Verify it's healthy:
+
+```bash
+curl http://localhost:8000/api/v1/health
+# {"status":"UP"}
+```
+
+Stop and remove it:
+
+```bash
+docker stop indian-equity-backend && docker rm indian-equity-backend
+```
