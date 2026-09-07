@@ -29,9 +29,17 @@ RUN pip install --no-cache-dir -r requirements.txt
 # dependency layer above stays cached across rebuilds.
 COPY app/ ./app/
 
-# Create a dedicated non-root user/group to run the application.
+# Create a dedicated non-root user/group to run the application, and a
+# writable cache directory for Hugging Face model downloads. `appuser`
+# has no home directory, so we point HF_HOME at an explicit location
+# under /app that we can chown.
 RUN addgroup --system appgroup \
-    && adduser --system --ingroup appgroup --no-create-home appuser
+    && adduser --system --ingroup appgroup --no-create-home appuser \
+    && mkdir -p /app/.cache/huggingface \
+    && chown -R appuser:appgroup /app/.cache
+
+ENV HF_HOME=/app/.cache/huggingface \
+    TRANSFORMERS_CACHE=/app/.cache/huggingface
 
 USER appuser
 
