@@ -4,6 +4,11 @@ pydantic
 python-dotenv
 huggingface_hub
 transformers
+
+# CPU-only PyTorch. The default `pip install torch` on Linux x86_64
+# pulls in the CUDA build (~2.5 GB), which we don't need on CPU-only
+# hosts like AWS EC2 t2.micro. This index serves the much smaller
+# CPU-only wheels (~200 MB).
+--extra-index-url https://download.pytorch.org/whl/cpu
 torch
-pytest
 

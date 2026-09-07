@@ -1,0 +1,6 @@
+-r requirements.txt
+
+# Test-only dependencies. Kept out of the production image / EC2
+# install so we don't pay their footprint at runtime.
+pytest
+httpx
